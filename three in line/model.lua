@@ -124,10 +124,8 @@ local function tickmodel()
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
         else
-<<<<<<< HEAD
           combomixer(matr)
           dump()
->>>>>>> d3c18ad7737585b7ca1da6b715626f4dafeaf7b9
         end
       elseif coordinates.d == 'd' then
         movemodel(position, position+10)
