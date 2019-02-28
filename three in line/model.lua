@@ -1,10 +1,14 @@
-
---[[В этом файле реализованны 5 функций модели:
+--[[В этом файле реализованны 5 функций модели и соответсвующий интерфейс:
     init - инициирует инициализацию первоночального массив и выводит его на экран
     mix  - инициализирует новый массив, без троек
     tick - отвечает за получение ввода от пользователя, а так же за обработку этого ввода
     dump - выводит массива
     move - меняет местами позиции в массиве
+
+    Все вспомогательные функции описаны в файле suppfunc.lua
+    Это сделано для удобства и разделения кода
+
+    Визуализация матрицы описана в файле vision.lua
 ]]
 
 require('vision')
@@ -12,13 +16,16 @@ require('suppfunc')
 
 math.randomseed(os.time())
 
+
+
 --инициализируем основную матрицу с которой будем работать
+
 local matr = {}
 
 
-
---если возможных перемещений - нет, то перемешиваем кристаллы (mix) чтобы
---возникли новые варианты перемещений - но не возникло новых готовых троек
+--Функция для инициализации массива с которым будем работать
+--Так же тут можно реализовать бонусные камни, вмешав их с любой рандомной
+--частотой в условия формирования массива. Бонусные камни должны иметь маркировку 7+
 local function mixmodel()
 
   for i=0,9 do
@@ -85,60 +92,58 @@ local function tickmodel()
       --переводим пользовтельский ввод в позицию массива
       local position = positiontranscription(coordinates.x, coordinates.y)
 
-      --TODO потом удалить везде функцию check
-      local function check()
-        transform = tramsformmatr(matr)
-        for i=0,9 do
-          for j=0,9 do
-            if j == 0 then
-              io.write('    ')
-            end
-            local position = positiontranscription(j,i)
-            io.write(transform[position]..' ')
-          end
-          io.write('\n')
-        end
-      end
+      --по направлению меняем положение кристалла, если это приведёт к появлению тройки
+      --если нет, откатываем перемещение и пишем что сюда не передвинуть
 
-      --по направлению меняем положение кристалла, если это приведёт к 3+
+      --если образовалась тройка, запускаем combomixer(реализация описана в suppfunc.lua),
+      --который убирает тройку из массива и заполняет новыми буквами
       if coordinates.d == 'l' then
         movemodel(position, position-1)
         if not combochecker(matr) then
           movemodel(position-1, position)
-          io.write("Сюда нельзя передвинуть!\n")
+          io.write("Здесь нет тройки!\n")
+          io.write("Попробуй ещё раз!\n")
         else
-        --  check()
-          combomixer(matr)
-
+          while combomixer(matr) == 'r' do
+            combomixer(matr)
+            dump()
+          end
         end
       elseif coordinates.d == 'r' then
         movemodel(position, position+1)
         if not combochecker(matr) then
           movemodel(position+1, position)
-          io.write("Сюда нельзя передвинуть!\n")
+          io.write("Здесь нет тройки!\n")
+          io.write("Попробуй ещё раз!\n")
         else
-      --    check()
-          combomixer(matr)
-
+          while combomixer(matr) == 'r' do
+            combomixer(matr)
+            dump()
+          end
         end
       elseif coordinates.d == 'u' then
         movemodel(position, position-10)
         if not combochecker(matr) then
           movemodel(position-10, position)
-          io.write("Сюда нельзя передвинуть!\n")
+          io.write("Здесь нет тройки!\n")
+          io.write("Попробуй ещё раз!\n")
         else
-        --  check()
-          combomixer(matr)
-
+          while combomixer(matr) == 'r' do
+            combomixer(matr)
+            dump()
+          end
         end
       elseif coordinates.d == 'd' then
         movemodel(position, position+10)
         if not combochecker(matr) then
           movemodel(position+10, position)
-          io.write("Сюда нельзя передвинуть!\n")
+          io.write("Здесь нет тройки!\n")
+          io.write("Попробуй ещё раз!\n")
         else
-      --    check()
-          combomixer(matr)
+          while combomixer(matr) == 'r' do
+            combomixer(matr)
+            dump()
+          end
         end
       end
 
@@ -153,12 +158,17 @@ local function tickmodel()
     io.write("Повторите ввод: ")
   end
 
+  --В конце каждого тика проверяем, если нет новых возможных троек - миксуем
+  if mixcheck(matr) == 0 then
+    mixmodel()
+  end
+
   return quit
 end
 
 
 
-
+--интерфейс модели
 
 --перемещение
 function move(from, to)
