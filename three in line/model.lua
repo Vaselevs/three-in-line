@@ -1,9 +1,10 @@
 
 --[[В этом файле реализованны 5 функций модели:
-    mixmodel - заполняет
-
-
-
+    init - инициирует инициализацию первоночального массив и выводит его на экран
+    mix  - инициализирует новый массив, без троек
+    tick - отвечает за получение ввода от пользователя, а так же за обработку этого ввода
+    dump - выводит массива
+    move - меняет местами позиции в массиве
 ]]
 
 require('vision')
@@ -20,13 +21,13 @@ local matr = {}
 --возникли новые варианты перемещений - но не возникло новых готовых троек
 local function mixmodel()
 
-  for i=1,10 do
-    for j=1,10 do
+  for i=0,9 do
+    for j=0,9 do
       while true do
         local tmp = math.random(6)
         --перебираем все возможные условия, при которых мы можем разместить букву. Если не можем, делаем снова рандом
         if (matr[#matr-19] ~= tmp) then
-          if (matr[#matr-1] ~= tmp) or ((matr[#matr-1] == tmp) and (j == 10 or j == 1)) then
+          if (matr[#matr-1] ~= tmp) or ((matr[#matr] == tmp) and (j == 10 or j == 1)) then
             matr[#matr+1] = tmp
             break
           else
@@ -41,7 +42,6 @@ local function mixmodel()
     end
   end
 
-  print(mixcheck(matr))
 --если 0 возможных троек, миксуем ещё раз
   if mixcheck(matr) == 0 then
     mixmodel()
@@ -70,63 +70,90 @@ end
 --d - направление одной буквой (lrud - left, right, up, down)
 --или q - выход из игры
 local function tickmodel()
-
+  io.write("Ждём ввода от пользователя: ")
   --получаем ввод пользователя
   reader = io.read()
   local coordinates = {}
+  local quit
 
   --проверяем полученный ввод на корректнность
   if string.match(reader, 'm [0-9] [0-9] [l,r,u,d]')  then
     coordinates.x, coordinates.y, coordinates.d = string.match(reader, "(%d) (%d) ([l,r,u,d])")
+
+    --проверяем возможность составления тройки, если возможно, меняем позиции кристалов в массиве
+    if inputtest(coordinates.x, coordinates.y, coordinates.d) then
+      --переводим пользовтельский ввод в позицию массива
+      local position = positiontranscription(coordinates.x, coordinates.y)
+
+      --TODO потом удалить везде функцию check
+      local function check()
+        transform = tramsformmatr(matr)
+        for i=0,9 do
+          for j=0,9 do
+            if j == 0 then
+              io.write('    ')
+            end
+            local position = positiontranscription(j,i)
+            io.write(transform[position]..' ')
+          end
+          io.write('\n')
+        end
+      end
+
+      --по направлению меняем положение кристалла, если это приведёт к 3+
+      if coordinates.d == 'l' then
+        movemodel(position, position-1)
+        if not combochecker(matr) then
+          movemodel(position-1, position)
+          io.write("Сюда нельзя передвинуть!\n")
+        else
+        --  check()
+          combomixer(matr)
+
+        end
+      elseif coordinates.d == 'r' then
+        movemodel(position, position+1)
+        if not combochecker(matr) then
+          movemodel(position+1, position)
+          io.write("Сюда нельзя передвинуть!\n")
+        else
+      --    check()
+          combomixer(matr)
+
+        end
+      elseif coordinates.d == 'u' then
+        movemodel(position, position-10)
+        if not combochecker(matr) then
+          movemodel(position-10, position)
+          io.write("Сюда нельзя передвинуть!\n")
+        else
+        --  check()
+          combomixer(matr)
+
+        end
+      elseif coordinates.d == 'd' then
+        movemodel(position, position+10)
+        if not combochecker(matr) then
+          movemodel(position+10, position)
+          io.write("Сюда нельзя передвинуть!\n")
+        else
+      --    check()
+          combomixer(matr)
+        end
+      end
+
+    end
+
   elseif reader == "q" then
-    io.write("Спасибо за игру!\n")
+    io.write("Спасибо за игру! \n")
     --возвращаем ключ выхода из игры
-    return 'q'
+    quit = 'q'
   else
     io.write("Неверный формат!\n")
     io.write("Повторите ввод: ")
   end
 
-
-  --проверяем возможность составления тройки, если возможно, меняем позиции кристалов в массиве
-  if inputtest(coordinates.x, coordinates.y, coordinates.d) then
-
-    --переводим пользовтельский ввод в позицию массива
-    local position
-    if positiontranscription(coordinates.x, coordinates.y) ~= 0 then
-      position = positiontranscription(coordinates.x, coordinates.y)
-
-      --по направлению меняем положение кристалла
-      if coordinates.d == l then
-        movemodel(position, position-1)
-      elseif coordinates.d == r then
-        movemodel(position, position+1)
-      elseif coordinates.d == u then
-        movemodel(position, position-10)
-      else
-        movemodel(position, position+10)
-      end
-
-      local checkedmatr = checkforcombo(matr)
-
-      for i=0,9 do
-        for j=0,9 do
-          io.write(checkedmatr[positiontranscription(i, j)])
-        end
-      end
-
-
-    end
-
-
-  elseif positiontranscription(coordinates.x, coordinates.y) ~= 0 then
-    io.write("Тут нет тройки! \n")
-    io.write("Повторите ввод: \n")
-  else
-    io.write("Не удалось получить координаты, повторите ввод: \n")
-  end
-
-
+  return quit
 end
 
 

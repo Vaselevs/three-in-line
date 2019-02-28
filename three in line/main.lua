@@ -2,21 +2,15 @@
 require('model')
 
 init()
---[[
-while quit ~= 'q' do
-  while quit ~= 'r' and quit ~= 'q' do
-    io.write("Ждём ввода от пользователя: ")
-    quit = tick()
-  end
 
+repeat
 
+  local quit = tick()
   if quit ~= 'q' then
     dump()
   end
 
-end
-]]
-
+until quit == 'q'
 
 
 --tick()

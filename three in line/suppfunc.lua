@@ -15,35 +15,34 @@ local function localpositiontranscription(x,y)
 
   if y == 0 then
     position = x + 1
+    return position
   else
     position = y * 10 + x + 1
+    return position
   end
-  return position
+
 end
 
---функция для проверки корректности ввода, и возможности вообще передвижения
+--функция для проверки корректности ввода, и возможности составления тройки в случае передвижения
 local function localinputtest(x,y,d)
 
+  local returned = true
+
   if x == '0' and d == "l" then
-    return false
+    returned = false
   elseif x == '9' and d == "r" then
-    return false
+    returned =  false
   elseif y == '0' and d == "u" then
-    return false
+    returned =  false
   elseif y == '9' and d == "d" then
-    return false
+    returned =  false
+  elseif positiontranscription(x,y) == nil then
+    --проверка нужна в случае некоректного ввода данных, координаты получают nil
+    --если данные неверны, возвращаем false, так как она не пройдёт проверку всё равно
+     returned =  false
   end
 
-  --проверка нужна в случае некоректного ввода данных, координаты получают nil
-  --если данные неверны, возвращаем true, так как она не пройдёт проверку всё равно
-  local position
-  if positiontranscription(x,y) ~= 0 then
-     position = positiontranscription(x,y)
-  else
-    return false
-  end
-
-
+  return returned
 end
 
 --функция, проверяющая количество возможных троек в матрице
@@ -138,6 +137,58 @@ local function localmixcheck(matr)
 end
 
 
+--внутренняя функция, приобразующая исходную матрицу в еденичный массив
+function tramsformmatr(matr)
+  local checkedmatr = {}
+  for i=0,9 do
+    for j=0,9 do
+
+      local position = localpositiontranscription(j, i)
+
+      if matr[position] == matr[position+1] and matr[position] == matr[position+2] then
+
+        if checkedmatr[position] ~= 1 then
+          checkedmatr[position] = 1
+        end
+
+        if checkedmatr[position+1] ~= 1 then
+          checkedmatr[position+1] = 1
+        end
+
+        if checkedmatr[position+2] ~= 1 then
+          checkedmatr[position+2] = 1
+        end
+
+      elseif checkedmatr[position] == nil then
+        checkedmatr[position] = 0
+      end
+
+      if matr[position] == matr[position+10] and matr[position] == matr[position+20] then
+
+        if checkedmatr[position] ~= 1 then
+          checkedmatr[position] = 1
+        end
+
+        if checkedmatr[position+10] ~= 1 then
+          checkedmatr[position+10] = 1
+        end
+
+        if checkedmatr[position+20] ~= 1 then
+          checkedmatr[position+20] = 1
+        end
+
+      elseif checkedmatr[position] == nil then
+          checkedmatr[position] = 0
+        end
+    end
+  end
+
+  return  checkedmatr
+
+end
+
+
+
 
 --TODO самая важная функция, которую надо доделать
 --преобразуем массив в единичный массив
@@ -146,34 +197,40 @@ end
 --функция для проверки комбо и их удаления после каждого тика
 local function localcombomixer(matr)
 
-  local checkedmatr = {}
-  for i=0,9 do
-    for j=0,9 do
+  checkedmatr = tramsformmatr(matr)
 
-      local position = positiontranscription(i, j)
-      local k = position
-      --первый проход, выявляем все горизонтальные совпадения
-      while matr[position] == matr[k] do
-
-
-        if matr[k] == matr[k+1] and matr[k] == matr[k+2] and string.match(k, '[9,10,19,20,29,30,39,40,49,50,59,60,69,70,79,80,89,90,99,100]') == nil then
-          if checkedmatr[k] == nil then
-            checkedmatr[position] = 1
-            checkedmatr[k+1] = 1
-          end
+  while combochecker(matr) do
+    for i = 1, 100 do
+      if checkedmatr[i] == 1 then
+        if i<11 then
+          local tmp = math.random(6)
+          matr[i] = tmp
         else
-          if checkedmatr[k] == nil then
-            checkedmatr[position] = 0
-          end
+          local tmp = matr[i]
+          matr[i] = matr[i-10]
+          matr[i-10] = tmp
         end
-
-        k = k + 1
-
       end
     end
   end
+end
 
-  return checkedmatr{}
+--функция для проверки наличия хотя бы одной тройки
+local function localcombochecker(matr)
+
+  checkedmatr = tramsformmatr(matr)
+  local returned
+
+  for i=1,100 do
+    if checkedmatr[i] == 1 then
+      returned =  true
+      break
+    else
+      returned = false
+    end
+  end
+
+  return returned
 
 end
 
@@ -184,8 +241,8 @@ function combomixer(matr)
   return localcombomixer(matr)
 end
 
-function inputtest(x, y, d)
-  return localinputtest(x, y, d)
+function inputtest(x,y,d)
+  return localinputtest(x,y,d)
 end
 
 function mixcheck(matr)
@@ -194,4 +251,8 @@ end
 
 function positiontranscription(x, y)
   return localpositiontranscription(x, y)
+end
+
+function combochecker(matr)
+  return localcombochecker(matr)
 end

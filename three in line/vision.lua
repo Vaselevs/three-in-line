@@ -1,14 +1,13 @@
-
 --реализуем отрисовку
 
-local function visionmodel(matr)
+local function localvision(matr)
 
 --меняем цыфры масива на буквы при визуализации, при этом не затрагивается основной логический массив
   local visionmatr = {}
 
   local k = 1
-  for i=1,10 do
-    for j=1,10 do
+  for i=0,9 do
+    for j=0,9 do
       if matr[k] == 1 then
         visionmatr[k] = 'A'
       elseif matr[k] == 2 then
@@ -26,12 +25,14 @@ local function visionmodel(matr)
     end
   end
 
+
+
   io.write('    0 1 2 3 4 5 6 7 8 9\n')
   io.write('   --------------------\n')
   k = 1
   for i=0,9 do
-    for j=1,10 do
-      if j == 1 then
+    for j=0,9 do
+      if j == 0 then
         io.write(i .. ' | ')
       end
         io.write(visionmatr[k] .. ' ')
@@ -43,5 +44,5 @@ local function visionmodel(matr)
 end
 
 function vision(matr)
-  visionmodel(matr)
+  localvision(matr)
 end
