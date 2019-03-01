@@ -86,7 +86,6 @@ local function tickmodel()
   --проверяем полученный ввод на корректнность
   if string.match(reader, 'm [0-9] [0-9] [l,r,u,d]')  then
     coordinates.x, coordinates.y, coordinates.d = string.match(reader, "(%d) (%d) ([l,r,u,d])")
-
     --проверяем возможность составления тройки, если возможно, меняем позиции кристалов в массиве
     if inputtest(coordinates.x, coordinates.y, coordinates.d) then
       --переводим пользовтельский ввод в позицию массива
@@ -100,6 +99,11 @@ local function tickmodel()
       if coordinates.d == 'l' then
         movemodel(position, position-1)
         if not combochecker(matr) then
+
+          local checkedmatr = transformmatr(matr)
+          showchecedmatr(checkedmatr)
+
+
           movemodel(position-1, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
@@ -110,6 +114,11 @@ local function tickmodel()
       elseif coordinates.d == 'r' then
         movemodel(position, position+1)
         if not combochecker(matr) then
+
+          local checkedmatr = transformmatr(matr)
+          showchecedmatr(checkedmatr)
+
+
           movemodel(position+1, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
@@ -120,22 +129,28 @@ local function tickmodel()
       elseif coordinates.d == 'u' then
         movemodel(position, position-10)
         if not combochecker(matr) then
+
+          local checkedmatr = transformmatr(matr)
+          showchecedmatr(checkedmatr)
+
           movemodel(position-10, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
         else
           combomixer(matr)
-          dump()
         end
       elseif coordinates.d == 'd' then
         movemodel(position, position+10)
         if not combochecker(matr) then
+
+          local checkedmatr = transformmatr(matr)
+          showchecedmatr(checkedmatr)
+
           movemodel(position+10, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
         else
           combomixer(matr)
-          dump()
         end
       end
 
@@ -147,7 +162,7 @@ local function tickmodel()
     quit = 'q'
   else
     io.write("Неверный формат!\n")
-    io.write("Повторите ввод: ")
+    io.write("Повторите ввод! \n")
   end
 
   --В конце каждого тика проверяем, если нет новых возможных троек - миксуем

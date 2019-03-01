@@ -9,7 +9,7 @@
     Так же самом низу описаны все функции, для которых есть внешний интерфейс
 
   внутренняя функция:
-    tramsformmatr          - функция преобразует массив из 100 элементов в массив из 0 и 1(а так же других маркеров)
+    transformmatr          - функция преобразует массив из 100 элементов в массив из 0 и 1(а так же других маркеров)
 
 ]]
 
@@ -173,15 +173,15 @@ end
 --1 - это буква которая состоит в тройке(или в любом другом 3+ объединении)
 
 --функция возвращает массив из 100 элементов, состоящий из 0 и 1 или любых других символов
-local function tramsformmatr(matr)
+function transformmatr(matr)
   local checkedmatr = {}
   for i=0,9 do
     for j=0,9 do
 
       --получаем текущуб позицию
-      local position = localpositiontranscription(j, i)
+      local position = positiontranscription(i, j)
 
-      if matr[position] == matr[position+1] and matr[position] == matr[position+2] then
+      if matr[position] == matr[position+1] and matr[position] == matr[position+2] and (j ~= 8 or j ~= 9) then
 
         if checkedmatr[position] ~= 1 then
           checkedmatr[position] = 1
@@ -199,7 +199,7 @@ local function tramsformmatr(matr)
         checkedmatr[position] = 0
       end
 
-      if matr[position] == matr[position+10] and matr[position] == matr[position+20] then
+      if matr[position] == matr[position+10] and matr[position] == matr[position+20] and i > 1 then
 
         if checkedmatr[position] ~= 1 then
           checkedmatr[position] = 1
@@ -224,6 +224,19 @@ local function tramsformmatr(matr)
 end
 
 
+function showchecedmatr(checkedmatr)
+  for i=0,9 do
+    io.write('    ')
+    for j=0,9 do
+      position = positiontranscription(j,i)
+      io.write(checkedmatr[position] .. ' ')
+    end
+    io.write('\n')
+  end
+  io.write('\n')
+end
+
+
 --функция, которая отвечает за очистку поля от троек
 --преобразуем массив в единичный массив
 --а дальше убираем все совпадения, постепенно перемещая все тройки наверх
@@ -233,11 +246,31 @@ end
 
 local function localcombomixer(matr)
 
-  checkedmatr = tramsformmatr(matr)
+  checkedmatr = transformmatr(matr)
+
+  local function checkerformixer(checkedmatr)
+
+    local returned
+
+    for i=1,100 do
+      if checkedmatr[i] == 1 then
+        returned = i
+        break
+      else
+        returned = false
+      end
+    end
+
+    return returned
+
+  end
+
+
 
 --пока количество троек > 0 продолжаем их удалять
-  if combochecker(matr) then
-    for i = 1, 100 do
+
+  while checkerformixer(checkedmatr) do
+    while checkerformixer(checkedmatr) do
 
 --пример бонусного камня, который удаляет столбец и строку, в которых находиться
 --[[  if matr[i] == 'bonus' then
@@ -249,19 +282,28 @@ local function localcombomixer(matr)
       --основные условия удаления
       --если это первый ряд, делаем рандомное число
       --если ниже первого ряда, передвигаем на одну позицию наверх
-      if checkedmatr[i] == 1 then
-        if i<11 then
-          local tmp = math.random(6)
+
+      local i = checkerformixer(checkedmatr)
+
+
+      if i<11 then
+        local tmp = math.random(6)
+        if matr[i] ~= tmp then
           matr[i] = tmp
-          dump()
-        else
-          local tmp = matr[i]
-          matr[i] = matr[i-10]
-          matr[i-10] = tmp
+          checkedmatr[i] = 0
           dump()
         end
+      else
+        local tmp = matr[i]
+        matr[i] = matr[i-10]
+        matr[i-10] = tmp
+        tmp = checkedmatr[i]
+        checkedmatr[i] = checkedmatr[i-10]
+        checkedmatr[i-10] = tmp
+        dump()
       end
     end
+  checkedmatr = transformmatr(matr)
   end
 end
 
@@ -269,7 +311,7 @@ end
 --функция для проверки наличия хотя бы одной тройки
 local function localcombochecker(matr)
 
-  checkedmatr = tramsformmatr(matr)
+  checkedmatr = transformmatr(matr)
   local returned
 
   for i=1,100 do
