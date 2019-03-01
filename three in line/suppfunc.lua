@@ -173,7 +173,7 @@ end
 --1 - это буква которая состоит в тройке(или в любом другом 3+ объединении)
 
 --функция возвращает массив из 100 элементов, состоящий из 0 и 1 или любых других символов
-function transformmatr(matr)
+local function transformmatr(matr)
   local checkedmatr = {}
   for i=0,9 do
     for j=0,9 do
@@ -221,19 +221,6 @@ function transformmatr(matr)
 
   return  checkedmatr
 
-end
-
-
-function showchecedmatr(checkedmatr)
-  for i=0,9 do
-    io.write('    ')
-    for j=0,9 do
-      position = positiontranscription(j,i)
-      io.write(checkedmatr[position] .. ' ')
-    end
-    io.write('\n')
-  end
-  io.write('\n')
 end
 
 

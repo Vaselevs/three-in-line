@@ -99,11 +99,6 @@ local function tickmodel()
       if coordinates.d == 'l' then
         movemodel(position, position-1)
         if not combochecker(matr) then
-
-          local checkedmatr = transformmatr(matr)
-          showchecedmatr(checkedmatr)
-
-
           movemodel(position-1, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
@@ -114,11 +109,6 @@ local function tickmodel()
       elseif coordinates.d == 'r' then
         movemodel(position, position+1)
         if not combochecker(matr) then
-
-          local checkedmatr = transformmatr(matr)
-          showchecedmatr(checkedmatr)
-
-
           movemodel(position+1, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
@@ -129,10 +119,6 @@ local function tickmodel()
       elseif coordinates.d == 'u' then
         movemodel(position, position-10)
         if not combochecker(matr) then
-
-          local checkedmatr = transformmatr(matr)
-          showchecedmatr(checkedmatr)
-
           movemodel(position-10, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
@@ -142,10 +128,6 @@ local function tickmodel()
       elseif coordinates.d == 'd' then
         movemodel(position, position+10)
         if not combochecker(matr) then
-
-          local checkedmatr = transformmatr(matr)
-          showchecedmatr(checkedmatr)
-
           movemodel(position+10, position)
           io.write("Здесь нет тройки!\n")
           io.write("Попробуй ещё раз!\n")
